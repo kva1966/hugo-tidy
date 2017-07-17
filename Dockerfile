@@ -1,31 +1,32 @@
-# Copyright 2017 Marc-Antoine Ruel. All rights reserved.
+# Copyright 2017 Kamal Advani. All rights reserved.
 # Use of this source code is governed under the Apache License, Version 2.0
 # that can be found in the LICENSE file.
 #
 # Doc: https://docs.docker.com/engine/reference/builder/
 
 # TODO(make): Use ALPINE_VERSION, should be soon: https://github.com/docker/docker/issues/18119
-FROM alpine:3.4
-MAINTAINER Marc-Antoine Ruel <d@maruel.net>
+FROM alpine:3.6
+MAINTAINER Kamal Advani <kamal.advani@namingcrisis.net>
 
 ARG HUGO_VERSION
 ARG PYGMENTS_VERSION
 
-# Logic
-COPY ["./docker-entrypoint.sh", "/usr/local/bin/docker-entrypoint.sh"]
-
-# minify
-COPY ["./minify", "/usr/local/bin/minify"]
+# Update Alpine Packages
+RUN apk update
 
 # pygments
-RUN apk update && apk add py-pygments && rm -rf /var/cache/apk/*
+RUN apk add py-pygments
 
-# hugo
-ADD ["https://github.com/spf13/hugo/releases/download/v${HUGO_VERSION}/hugo_${HUGO_VERSION}_Linux-64bit.tar.gz", "/usr/local/hugo.tar.gz"]
-RUN tar xzf /usr/local/hugo.tar.gz -C /usr/local/ && \
-    mv /usr/local/hugo*/hugo* /usr/local/bin/hugo && \
-    rm -rf /usr/local/hugo*
+# Clean-up Alpine Packages
+RUN rm -rf /var/cache/apk/*
 
+# Note: https://docs.docker.com/engine/reference/builder/#add
+# However, ADD seems to be decompressing remote URLs here!
+# Docker Version:      17.06.0-ce
+# The tar.gz file unpacks the 'hugo' binary directly to the folder.
+ADD https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/hugo_${HUGO_VERSION}_Linux-64bit.tar.gz /usr/local/bin
+
+EXPOSE 1313 9000 9001 9007 9011
 VOLUME /data
 WORKDIR /data
-ENTRYPOINT ["/bin/sh", "/usr/local/bin/docker-entrypoint.sh"]
+ENTRYPOINT ["/usr/local/bin/hugo"]
