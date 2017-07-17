@@ -15,7 +15,7 @@ Basically, just a self-contained Hugo with Pygments wrapper. Got tired of my Lin
 distribution's packages going out of date and just generally messing up.
 
 
-# Sample Run
+## Sample Run
 
 ```
 alias hugo=docker run --rm -u $(id -u):$(id -g) -v $(pwd):/data kva1966/hugo-tidy:hugo-0.25.1-pygments-2.2.0 
