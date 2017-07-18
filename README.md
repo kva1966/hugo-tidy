@@ -17,9 +17,15 @@ distribution's packages going out of date and just generally messing up.
 
 ## Sample Run
 
+Docker Registry entry is [here](https://hub.docker.com/r/kva1966/hugo-tidy/).
+
 ```
-alias hugo=docker run --rm -u $(id -u):$(id -g) -v $(pwd):/data kva1966/hugo-tidy:hugo-0.25.1-pygments-2.2.0 
-alias hugo-server=docker run --rm -u $(id -u):$(id -g) -v $(pwd):/data -p 1313:1313 kva1966/hugo-tidy:hugo-0.25.1-pygments-2.2.0 server --bind 0.0.0.0
+HUGO_DOCKER_IMAGE=kva1966/hugo-tidy:hugo-0.25.1-pygments-2.2.0
+
+alias docker-run-with-uid='docker run --rm -u $(id -u):$(id -g)'
+alias hugo='docker-run-with-uid -v $(pwd):/data $HUGO_DOCKER_IMAGE'
+alias hugo-serve='docker-run-with-uid -v $(pwd):/data -p 1313:1313 $HUGO_DOCKER_IMAGE server --bind 0.0.0.0'
+
 
 cd site-directory/
 hugo
