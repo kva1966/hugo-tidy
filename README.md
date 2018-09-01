@@ -39,7 +39,7 @@ export -f hugo
 
 
 hugoserve() {
-  docker_run_with_uid -v $(pwd):/data -p 1313:1313 $HUGO_DOCKER_IMAGE server --bind 0.0.0.0
+  docker_run_with_uid -v $(pwd):/data -p 1313:1313 $HUGO_DOCKER_IMAGE server --bind 0.0.0.0 $@
 }
 
 export -f hugoserve
