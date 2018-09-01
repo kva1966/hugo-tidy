@@ -4,27 +4,48 @@
 #
 # Doc: https://docs.docker.com/engine/reference/builder/
 
-# TODO(make): Use ALPINE_VERSION, should be soon: https://github.com/docker/docker/issues/18119
-FROM alpine:3.6
+ARG ALPINE_VERSION
+FROM alpine:${ALPINE_VERSION}
 MAINTAINER Kamal Advani <kamal.advani@namingcrisis.net>
 
 ARG HUGO_VERSION
 ARG PYGMENTS_VERSION
 
+ENV LAST_UPDATED 2018-09-01_19-35
+
+#
 # Update Alpine Packages
+#
 RUN apk update
+
+
+#
+# Install required Packages
+#
+
+# curl
+RUN apk add curl
 
 # pygments
 RUN apk add py-pygments
 
+# Get the Hugo package, and store it in tmp
+RUN curl -L https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/hugo_${HUGO_VERSION}_Linux-64bit.tar.gz > /tmp/hugo.tar.gz
+
+# Now trash curl, to reduce size
+RUN apk del curl
+
 # Clean-up Alpine Packages
 RUN rm -rf /var/cache/apk/*
 
-# Note: https://docs.docker.com/engine/reference/builder/#add
-# However, ADD seems to be decompressing remote URLs here!
-# Docker Version:      17.06.0-ce
-# The tar.gz file unpacks the 'hugo' binary directly to the folder.
-ADD https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/hugo_${HUGO_VERSION}_Linux-64bit.tar.gz /usr/local/bin
+
+#
+# Unpack and Setup
+#
+
+# Directly extract binary to /usr/local/bin
+RUN tar xf /tmp/hugo.tar.gz -C /usr/local/bin
+
 
 EXPOSE 1313 9000 9001 9007 9011
 VOLUME /data

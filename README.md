@@ -19,14 +19,35 @@ distribution's packages going out of date and just generally messing up.
 
 Docker Registry entry is [here](https://hub.docker.com/r/kva1966/hugo-tidy/).
 
+Sample configuration for ease of use in bashrc or profile:
+
 ```
-HUGO_DOCKER_IMAGE=kva1966/hugo-tidy:hugo-0.25.1-pygments-2.2.0
+export HUGO_DOCKER_IMAGE=kva1966/hugo-tidy:hugo-0.48-pygments-2.2.0
 
-alias docker-run-with-uid='docker run --rm -u $(id -u):$(id -g)'
-alias hugo='docker-run-with-uid -v $(pwd):/data $HUGO_DOCKER_IMAGE'
-alias hugo-serve='docker-run-with-uid -v $(pwd):/data -p 1313:1313 $HUGO_DOCKER_IMAGE server --bind 0.0.0.0'
+docker_run_with_uid() {
+  docker run --rm -u $(id -u):$(id -g) $@
+}
+
+export -f docker_run_with_uid
 
 
+hugo() {
+  docker_run_with_uid -v $(pwd):/data $HUGO_DOCKER_IMAGE $@
+}
+
+export -f hugo
+
+
+hugoserve() {
+  docker_run_with_uid -v $(pwd):/data -p 1313:1313 $HUGO_DOCKER_IMAGE server --bind 0.0.0.0
+}
+
+export -f hugoserve
+```
+
+Using the container with previously defined shell functions:
+
+```
 cd site-directory/
 hugo
 hugo-server
